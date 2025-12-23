@@ -87,6 +87,22 @@ void print_string(FILE* f, const void* src, size_t n) {
 	fprintf(f, "\"\n");
 }
 
+#define PROGRESS_BAR_WIDTH 50
+
+void print_progress_bar(float progress) {
+	int completed = PROGRESS_BAR_WIDTH * progress;
+	int remaining;
+	remaining = PROGRESS_BAR_WIDTH - completed;
+	printf("Progress: [");
+	for (int i = 0; i < completed; i++) {
+		printf("#");
+	}
+	for (int i = 0; i < remaining; i++) {
+		printf(".");
+	}
+	printf("] %.1f%% Complete\r", 100 * progress);
+}
+
 #if USE_LIBUSB
 void find_endpoints(libusb_device_handle* dev_handle, int result[2]) {
 	int endp_in = -1, endp_out = -1;
@@ -653,22 +669,6 @@ void select_partition(spdio_t* io, const char* name,
 
 	encode_msg(io, cmd, &pkt,
 		sizeof(pkt.name) + (mode64 ? 16 : 4));
-}
-
-#define PROGRESS_BAR_WIDTH 50
-
-void print_progress_bar(float progress) {
-	int completed = PROGRESS_BAR_WIDTH * progress;
-	int remaining;
-	remaining = PROGRESS_BAR_WIDTH - completed;
-	printf("Progress: [");
-	for (int i = 0; i < completed; i++) {
-		printf("#");
-	}
-	for (int i = 0; i < remaining; i++) {
-		printf(".");
-	}
-	printf("] %.1f%% Complete\r", 100 * progress);
 }
 
 uint64_t dump_partition(spdio_t* io,
