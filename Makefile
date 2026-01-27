@@ -2,6 +2,8 @@
 LIBUSB = 1
 CFLAGS = -O2 -Wall -Wextra -std=c99 -pedantic -Wno-unused
 CFLAGS += -DUSE_LIBUSB=$(LIBUSB)
+CC = i686-w64-mingw32-gcc
+CFLAGS += -static
 LIBS = -lm
 APPNAME = spd_dump
 APPNAME2 = spd_dump_interactive
@@ -14,7 +16,7 @@ endif
 all: clean GITVER.h $(APPNAME) $(APPNAME2)
 
 clean:
-	$(RM) GITVER.h $(APPNAME) $(APPNAME2)
+	$(RM) GITVER.h $(APPNAME) $(APPNAME2) $(APPNAME).exe $(APPNAME2).exe
 
 GITVER.h:
 	echo "#define GIT_VER \"$(shell git rev-parse --abbrev-ref HEAD)\"" > GITVER.h
