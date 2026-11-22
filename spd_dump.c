@@ -234,10 +234,10 @@ int main(int argc, char **argv) {
 				}
 			}
 
-			fdl_loaded++;
+						fdl_loaded++;
 			argc -= 3; argv += 3;
 
-		} else if (!strcmp(argv, "exec")) {
+		} else if (!strcmp(argv[1], "exec")) {
 			if (fdl_loaded > 1) {
 				memset(&Da_Info, 0, sizeof(Da_Info));
 				encode_msg(io, BSL_CMD_EXEC_DATA, NULL, 0);
@@ -246,7 +246,7 @@ int main(int argc, char **argv) {
 				encode_msg(io, BSL_CMD_CONNECT, NULL, 0);
 				send_msg(io);
 				ret = recv_msg_timeout(io, 5000);
-				if (!ret) ERR_EXIT("FDL2 connect timeout\n");
+				if (!ret) ERR_EXIT("FDL2 handshake timeout\n");
 				ret = recv_type(io);
 				if (ret == BSL_REP_VER) {
 					DBG_LOG("BSL_REP_VER: ");
@@ -265,15 +265,6 @@ int main(int argc, char **argv) {
 						io->flags &= ~FLAGS_TRANSCODE;
 						DBG_LOG("DISABLE_TRANSCODE\n");
 					}
-				}
-				if (Da_Info.bSupportRawData == 2) {
-					encode_msg(io, BSL_CMD_WRITE_RAW_DATA_ENABLE, NULL, 0);
-					if (!send_and_check(io)) DBG_LOG("ENABLE_WRITE_RAW_DATA\n");
-				}
-				if (nand_id == DEFAULT_NAND_ID) {
-					nand_info[0] = (uint8_t)pow(2, nand_id & 3); //page size
-					nand_info[1] = 32 / (uint8_t)pow(2, (nand_id >> 2) & 3); //spare area size
-					nand_info[2] = 64 * (uint8_t)pow(2, (nand_id >> 4) & 3); //block size
 				}
 			}
 			argc -= 1; argv += 1;
