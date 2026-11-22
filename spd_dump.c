@@ -237,7 +237,7 @@ int main(int argc, char **argv) {
 						fdl_loaded++;
 			argc -= 3; argv += 3;
 
-		} else if (!strcmp(argv, "exec")) {
+		} else if (!strcmp(argv[1], "exec")) {
 			if (fdl_loaded > 1) {
 				memset(&Da_Info, 0, sizeof(Da_Info));
 				encode_msg(io, BSL_CMD_EXEC_DATA, NULL, 0);
