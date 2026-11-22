@@ -237,26 +237,22 @@ int main(int argc, char **argv) {
 			fdl_loaded++;
 			argc -= 3; argv += 3;
 
-		} else if (!strcmp(argv[1], "exec")) {
+		} else if (!strcmp(argv, "exec")) {
 			if (fdl_loaded > 1) {
 				memset(&Da_Info, 0, sizeof(Da_Info));
 				encode_msg(io, BSL_CMD_EXEC_DATA, NULL, 0);
 				send_msg(io);
-				Sleep(200);
-				for (int i = 0; ; i++) {
-					encode_msg(io, BSL_CMD_CHECK_BAUD, NULL, 0);
-					send_msg(io);
-					ret = recv_msg_timeout(io, 1000);
-					if (ret) break;
-					if (i >= 10) ERR_EXIT("FDL2 handshake timeout\n");
-				}
+				Sleep(500);
+				encode_msg(io, BSL_CMD_CONNECT, NULL, 0);
+				send_msg(io);
+				ret = recv_msg_timeout(io, 5000);
+				if (!ret) ERR_EXIT("FDL2 connect timeout\n");
 				ret = recv_type(io);
 				if (ret == BSL_REP_VER) {
 					DBG_LOG("BSL_REP_VER: ");
 					print_string(stderr, io->raw_buf + 4, READ16_BE(io->raw_buf + 2));
 					encode_msg(io, BSL_CMD_CONNECT, NULL, 0);
 					if (send_and_check(io)) exit(1);
-					DBG_LOG("CMD_CONNECT FDL2\n");
 				} else if (ret == BSL_REP_INCOMPATIBLE_PARTITION) {
 					get_Da_Info(io);
 				} else if (ret != BSL_REP_ACK) {
