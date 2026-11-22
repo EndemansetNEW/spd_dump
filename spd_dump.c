@@ -246,7 +246,7 @@ int main(int argc, char **argv) {
 				ret = recv_msg_timeout(io, 2000);
 				if (!ret) ERR_EXIT("FDL2 handshake timeout\n");
 				ret = recv_type(io);
-				if (ret == BSL_REP_LOG) {
+				if (ret == 0x8A) {
 					DBG_LOG("BSL_REP_LOG: ");
 					print_string(stderr, io->raw_buf + 4, READ16_BE(io->raw_buf + 2));
 					ret = recv_msg_timeout(io, 2000);
