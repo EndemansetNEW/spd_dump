@@ -242,16 +242,26 @@ int main(int argc, char **argv) {
 				memset(&Da_Info, 0, sizeof(Da_Info));
 				encode_msg(io, BSL_CMD_EXEC_DATA, NULL, 0);
 				send_msg(io);
-				// Feature phones respond immediately,
-				// but it may take a second for a smartphone to respond.
-				ret = recv_msg_timeout(io, 15000);
-				if (!ret) ERR_EXIT("timeout reached\n");
+				Sleep(200);
+				for (int i = 0; ; i++) {
+					uint8_t sync = HDLC_HEADER;
+					io->send(io, &sync, 1);
+					ret = recv_msg_timeout(io, 1000);
+					if (ret) break;
+					if (i >= 10) ERR_EXIT("FDL2 handshake timeout\n");
+				}
 				ret = recv_type(io);
-				// Is it always bullshit?
-				if (ret == BSL_REP_INCOMPATIBLE_PARTITION)
+				if (ret == BSL_REP_VER) {
+					DBG_LOG("BSL_REP_VER: ");
+					print_string(stderr, io->raw_buf + 4, READ16_BE(io->raw_buf + 2));
+					encode_msg(io, BSL_CMD_CONNECT, NULL, 0);
+					if (send_and_check(io)) exit(1);
+					DBG_LOG("CMD_CONNECT FDL2\n");
+				} else if (ret == BSL_REP_INCOMPATIBLE_PARTITION) {
 					get_Da_Info(io);
-				else if (ret != BSL_REP_ACK)
+				} else if (ret != BSL_REP_ACK) {
 					ERR_EXIT("unexpected response (0x%04x)\n", ret);
+				}
 				DBG_LOG("EXEC FDL2\n");
 				if (Da_Info.bDisableHDLC) {
 					encode_msg(io, BSL_CMD_DISABLE_TRANSCODE, NULL, 0);
