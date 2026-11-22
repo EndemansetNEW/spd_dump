@@ -13,9 +13,13 @@ jobs:
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
 
+      - name: Enable modern Win32 device notification headers
+        shell: pwsh
+        run: |
+          $header = "#define _WIN32_WINNT 0x0601`n#define WINVER 0x0601`n#include <windows.h>`n#include <dbt.h>`n"
+          Set-Content -Path "common.h" -Value ($header + (Get-Content -Path "common.h" -Raw))
+
       - name: Build spd_dump.sln (Win32)
-        env:
-          CL: /D_WIN32_WINNT=0x0601 /DWINVER=0x0601
         run: msbuild spd_dump.sln /p:Configuration=Release /p:Platform=Win32
 
       - name: Package executable and Spreadtrum DLLs
