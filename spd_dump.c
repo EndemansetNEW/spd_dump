@@ -244,8 +244,8 @@ int main(int argc, char **argv) {
 				send_msg(io);
 				Sleep(200);
 				for (int i = 0; ; i++) {
-					uint8_t sync = HDLC_HEADER;
-					io->send(io, &sync, 1);
+					io->raw_buf = HDLC_HEADER;
+					send_buf(io, 1);
 					ret = recv_msg_timeout(io, 1000);
 					if (ret) break;
 					if (i >= 10) ERR_EXIT("FDL2 handshake timeout\n");
