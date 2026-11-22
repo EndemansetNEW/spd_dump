@@ -236,11 +236,13 @@ int main(int argc, char **argv) {
 
 						fdl_loaded++;
 			argc -= 3; argv += 3;
-
 		} else if (!strcmp(argv[1], "exec")) {
 			if (fdl_loaded > 1) {
 				memset(&Da_Info, 0, sizeof(Da_Info));
 				encode_msg(io, BSL_CMD_EXEC_DATA, NULL, 0);
+				send_msg(io);
+				Sleep(200);
+				encode_msg(io, BSL_CMD_CONNECT, NULL, 0);
 				send_msg(io);
 				ret = recv_msg_timeout(io, 5000);
 				if (!ret) ERR_EXIT("FDL2 handshake timeout\n");
@@ -254,9 +256,6 @@ int main(int argc, char **argv) {
 				}
 				if (ret != BSL_REP_ACK)
 					ERR_EXIT("unexpected response (0x%04x)\n", ret);
-				encode_msg(io, BSL_CMD_CONNECT, NULL, 0);
-				if (send_and_check(io)) exit(1);
-				DBG_LOG("CMD_CONNECT FDL2\n");
 				DBG_LOG("EXEC FDL2\n");
 				if (Da_Info.bDisableHDLC) {
 					encode_msg(io, BSL_CMD_DISABLE_TRANSCODE, NULL, 0);
