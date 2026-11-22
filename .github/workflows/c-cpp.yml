@@ -14,6 +14,8 @@ jobs:
         uses: microsoft/setup-msbuild@v2
 
       - name: Build spd_dump.sln (Win32)
+        env:
+          CL: /D_WIN32_WINNT=0x0601 /DWINVER=0x0601
         run: msbuild spd_dump.sln /p:Configuration=Release /p:Platform=Win32
 
       - name: Package executable and Spreadtrum DLLs
