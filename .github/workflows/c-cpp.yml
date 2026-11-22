@@ -1,0 +1,29 @@
+name: Build spd_dump (Windows COM)
+
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Build spd_dump.sln (Win32)
+        run: msbuild spd_dump.sln /p:Configuration=Release /p:Platform=Win32
+
+      - name: Package executable and Spreadtrum DLLs
+        run: |
+          mkdir dist
+          copy Release\spd_dump.exe dist\
+          xcopy /E /I /Y Lib\* dist\
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: spd_dump-win-com
+          path: dist/
